@@ -1,4 +1,9 @@
+import os
+current_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+os.chdir(current_path + "/pykida")
 from kida_controller import *
+current_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+os.chdir(current_path + "/Nahoon_kida.uva.2014")
 
 #f = 'kida.uva.2014'
 ####################GETTING THE KIDA FILE###########

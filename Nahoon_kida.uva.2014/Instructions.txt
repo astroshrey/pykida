@@ -1,0 +1,226 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! NOTICE TO USE NAHOON_1D AND COMPUTE THE MODEL UNCERTAINTIES
+! V. Wakelam Aug. 2008
+! update dec 2011 - see Wakelam et al. (2012) for details
+! 
+! This notice contains information on how to use nahoon,
+! compute the rate coefficient uncertainty propagation, 
+! and how to include networks downloaded from KIDA
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+Nahoon is a gas-phase chemical model, which computes the chemical 
+evolution in a 1D temperature and density structure. The current version of the 
+model uses chemical networks downloaded from KIDA but the model can be adapted to 
+any network. In addition to this network, an approximation from Lee et al. (1996)
+is used to take into account the CO and H2 self-shielding in the 1D dimension. 
+Please, note that this is only an approximation and look at Lee et al. paper
+for any detail on the computation. The differential equations for the abundance evolutions 
+are not explicitely writen but are computed in a loop. 
+The solver is DLSODES from odepack (http://www.netlib.org/odepack/). The model is written in
+fortran 90.
+
+More details on this program can be found in a publication in Astrophysical Journal Supplement 
+Series from Wakelam et al. (2012).
+
+In this notice, I try to explain how to use these tools but if some information 
+is missing or unclear, please contact me (wakelam@obs.u-bordeaux1.fr).
+
+!!!!!!!!!!!!!!!!!!  HOW TO USE THE MODEL  !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!!! INPUT FILES:
+Seven input files are needed:	
+- kida.uva.xxxx is the list of reactions. 
+- cond_initial.dat contains the initial conditions and the list of species. The abundance species are given compared to total H.
+- input_parameter.dat contains some of the model parameters such as the gas
+temperature and density for the case of the model used in 0D.
+- timeres.dat is the list of times at which the abundances will be given in
+the plot.dat file.
+- Self_Shielding_data contains the parameters to compute the CO and H2 self-
+shielding factors taken from Lee et al. (1996).
+- header.f90 defines some of the parameters and contains the number of species, reactions, output
+times, spatial points and elements.
+
+ALLWAYS RESPECT THE FORMAT OF THE INPOUT FILES.
+
+!!! OUTPUT FILES:
+There are 4 output files:
+- Kout.dat gives you the rate coefficients for each reaction.
+- plot.dat gives you the species abundances at the times listed in timeres.dat.
+- verif.dat gives you the balance of positive and negative charges and the
+elemental abundances at selected times indicated in the main program (the ITEST table). 
+The main rates and reactions of formation and destruction for each species at selected 
+times are also given. The reactions are indicated by the number of the reaction in the network.
+- output.dat contains the chemical composition at the time specified in input_parameters.dat in the same format
+as cond_initial.dat
+
+!!! COMPILE AND RUN:
+To compile and run the model you need a fortran compiler. 
+If you are using gfortran, here are the command lines to compile and run the program:
+
+gfortran opkd*.f nahoon_1d.f90 -o nahoon_1d or ifort opkd*.f nahoon_1d.f90 -o nahoon_1d
+nahoon_1d  (or ./nahoon_1d depending on the system you are using)
+
+!!!  MODIFICATION OF THE CHEMICAL NETWORK:
+If you have modified the chemical network, you may have to do one the following things.
+
+* Change the name of network in the main code (nahoon_1d.f90):
+       OPEN (UNIT=1,FILE='osu_03_2008',STATUS='OLD') 
+
+* If you want to change the number of reactions:
+- Change NRTOT=4479 by the number of reactions in header.f90
+
+* If you want to change the number of species:
+- Change NS=4479 by the number of reactions in header.f90
+
+* If you are changing the number of elements:
+- Of course, change the cond_initial.dat file.
+- Change: NELEM=14 in header.f90, which represents the number of elements + 1 (charge)
+- Change the format 1 in nahoon_1d.f90	
+
+* If you are changing the number of times for the output in timeres.dat:
+- Change NTIME=124 in header.f90
+- Change format 8 and 9 in nahoon_1d.f90
+
+
+
+!!!  THE IDL PROCEDURES
+
+- plot_ab.pro plots the abundance of a selected species as a function of time 
+from the one single output file (plot.dat) of the chemical model.
+
+The other procedures are useful for the computation of the uncertainties (N being the 
+number of runs you have done):
+- verif_dist.pro is a procedure that check the distributions of the parameters you have
+randomly chosen (histogram_ez.pro is used here).
+- read_plot.pro plots on the same figure a number of abundances of one selected species 
+from the plot_xxx.dat files. 
+
+!!!!!!!!!!!!!!!!  KIDA networks  !!!!!!!!!!!!!!!!!!!!!!!
+The format of the networks downloaded from KIDA is compatible this Nahoon. 
+The file cond_initial.dat needs however to be changed according to the list of species
+downloaded from KIDA. To do so, use the IDL procedure rewrite_kida_species.pro as explained below.
+
+
+DO NOT CHANGE THE NUMBER OF THE REACTIONS. DUPLICATED REACTIONS (with complementary 
+ranges of temperature) MUST HAVE THE SAME NUMBER. 
+Nahoon checks for duplicated reactions and chooses the correct rate coefficient depending 
+on the temperature. Nahoon does not extrapolate outside the defined range of temperature.
+
+
+- In additions to the reactions downloaded from KIDA, these reactions with grains
+have to be added at the end:
+GRAIN0     e-                     GRAIN-                                                   3.400e-03  5.000e-01  0.000e+00 1.00e+00 0.00e+00 logn  0  -9999   9999  0  6075 1
+GRAIN-     C+                     GRAIN0     C                                             2.300e-05  5.000e-01  0.000e+00 1.00e+00 0.00e+00 logn  0  -9999   9999  0  6076 1  1
+GRAIN-     Fe+                    GRAIN0     Fe                                            1.100e-05  5.000e-01  0.000e+00 1.00e+00 0.00e+00 logn  0  -9999   9999  0  6077 1  1
+GRAIN-     H+                     GRAIN0     H                                             7.900e-05  5.000e-01  0.000e+00 1.00e+00 0.00e+00 logn  0  -9999   9999  0  6078 1  1
+GRAIN-     He+                    GRAIN0     He                                            3.900e-05  5.000e-01  0.000e+00 1.00e+00 0.00e+00 logn  0  -9999   9999  0  6079 1  1
+GRAIN-     Mg+                    GRAIN0     Mg                                            1.600e-05  5.000e-01  0.000e+00 1.00e+00 0.00e+00 logn  0  -9999   9999  0  6080 1  1
+GRAIN-     N+                     GRAIN0     N                                             2.100e-05  5.000e-01  0.000e+00 1.00e+00 0.00e+00 logn  0  -9999   9999  0  6081 1  1
+GRAIN-     Na+                    GRAIN0     Na                                            1.600e-05  5.000e-01  0.000e+00 1.00e+00 0.00e+00 logn  0  -9999   9999  0  6082 1  1
+GRAIN-     O+                     GRAIN0     O                                             2.000e-05  5.000e-01  0.000e+00 1.00e+00 0.00e+00 logn  0  -9999   9999  0  6083 1  1
+GRAIN-     S+                     GRAIN0     S                                             1.400e-05  5.000e-01  0.000e+00 1.00e+00 0.00e+00 logn  0  -9999   9999  0  6084 1  1
+GRAIN-     Si+                    GRAIN0     Si                                            1.500e-05  5.000e-01  0.000e+00 1.00e+00 0.00e+00 logn  0  -9999   9999  0  6085 1  1
+GRAIN-     H3+                    GRAIN0     H          H2                                 4.600e-05  5.000e-01  0.000e+00 1.00e+00 0.00e+00 logn  0  -9999   9999  0  6086 1  1
+GRAIN-     HCO+                   GRAIN0     CO         H                                  1.500e-05  5.000e-01  0.000e+00 1.00e+00 0.00e+00 logn  0  -9999   9999  0  6087 1  1
+XH         XH                     H2                                                       1.000e+00  0.000e-00  0.000e+00 1.00e+00 0.00e+00 logn 10  -9999   9999 10  6088 1  1
+H                                 XH                                                       7.920e-05  5.000e-01  0.000e+00 1.00e+00 0.00e+00 logn 11  -9999   9999 11  6089 1  1
+
+
+- rewrite_kida_species.pro is to rewrite the file cond_initial.dat according to 
+the list of species given by KIDA.
+In addition, the grains have to be added:
+ ??? GRAIN0      0  0  0  0  0  0  0  0  0  0  0  0  0  0  1.32150000D-12
+ ??? GRAIN-     -1  0  0  0  0  0  0  0  0  0  0  0  0  0  0.00000000D+00
+ ??? XH          0  1  0  0  0  0  0  0  0  0  0  0  0  0  0.00000000D+00
+
+You also need to set the elemental abundances. Electron abundances are computed by the model at the beginning of 
+the run so you do not need to change their abundance. Do not forget to set the grain initial abundances.
+
+!!!!!!!!!!!!!!!!!!  HOW TO COMPUTE THE UNCERTAINTY PROPAGATION  !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+A fortran program (run_rates.f) is provided in order to compute the propagation of the 
+uncertainties in rate coefficient during the model calculations. This program reads the uncertainty in
+the rate coefficient provided in the network, as well as the format of this uncertainty (normal,
+lognormal, uniform or loguniform). It then generate random numbers in order to randonmly modify the
+first parameter (alpha in the network) of all the rate coefficients within the uncertainty range. These random 
+numbers are then written in files named "alpha" that are read and used in the program nahoon to modify the rate
+coefficients used for the computation.
+
+To set up the uncertainty propagation:
+- Modify the first parameter in the file "input_parameter.dat" from N to Y.
+- Check that you have created a directory "MCUP" inside the directory where you are working.
+- compile "run_rates.f" program: gfortran run_rates.f -o run_rates
+- set up the number of runs (nrun) in the script_run file. For large networks such as kida.uva, we advise to
+run 2000 models to get the correct mean abundance.
+- run the script_unc script as a bash task: ./script_unc > liste &
+It will save the alpha and plot files with changing the name including the number of the run in the MCUP
+directory. 
+
+At the end of the simulations, the post-processing is done in two steps. The first step consist in creating one
+file per species, which contain the results of all the simulations. The second step uses those files to compute
+the error bars and mean abundance per species as well.
+The things to do are:
+- create two directories:
+mkdir ab_spec
+mkdir stand_dev
+- start IDL : idl
+- run the first procedure: .r species_file
+- run the second procedure: .r stand_dev
+In the files produced by the stand_dev.pro file have the following format:
+- first column: log10 of the time
+- second column: log10 of the mean abundance
+- third column: 1 sigma standard deviation
+  
+In this case, the error bars are computed using the standard deviation of the different abundances computed by
+the model. When the abundance species vary strongly with time, these values can overestimate the real error bar
+(see Wakelam et al. 2005).
+ 
+ To plot the results (mean abundance and 2sigma error bar), we also provide the plot_unc.pro IDL procedure.
+
+!!!!!!!!!!!!!!!!!!  FORMAT OF KIDA.UVA NETWORK !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+FOR ANY DETAIL ON THE RATE COEFFICIENTS AND HOW TO USE THEM, PLEASE LOOK AT THE KIDA PAPER (Wakelam et al. 2012) AND VISIT THE KIDA WEB PAGE: http://kida.obs.u-bordeaux1.fr/help
+
+The format of the kida.uva file is the following (as for kida networks downloaded from kida):
+
+Format : 3(a10 1x) 1x 5(a10 1x) 1x 3(e10.3 1x) i5 1x i5 1x a4 1x i2 1x i6 1x i6 1x i2 1x i5 1x i2 1x i1
+Reactants   Products  alpha  beta  gamma  F g Type_of_uncertainty   itype    Trange   Formula    Number     Number_of_(alpha, beta, gamma)      Recommendation
+
+alpha, beta, gamma are the parameters to compute the rate coefficients. The formula depends on the type of reaction. See http://kida.obs.u-bordeaux1.fr/help
+
+F is the uncertainty factor on the rate coefficient (See http://kida.obs.u-bordeaux1.fr/help)
+
+g is the temperature dependence of this uncertainty factor (See http://kida.obs.u-bordeaux1.fr/help)
+
+Type of uncertainty : lognormal (logn) , normal (norm) , loguniform (logu) , uniform (unif)
+
+Itype is the type of reaction :
+See http:// kida.obs.u-bordeaux1.fr/help
+
+Trange is the range of temperatures the rate coefficient is valid. We do not recommend to make extrapolations outside this range. 
+When we do not have information on Trange, default values are used: -9999,9999.
+
+Formula is a number that referes to the formula needed to compute the rate coefficient of the reaction. 
+1: Cosmic-ray ionization (direct and undirect)
+2: Photo-dissociation (Draine)
+3: Kooij 
+4: ionpol1 
+5: ionpol2 
+6: Troe fall-off
+Correspondances of the names to the mathematical expression can be found at this address: http://kida.obs.u-bordeaux1.fr/help
+Note that for photorates, the type of the UV field is contained in the name fo the formula. For example, Draine means standard interstellar radiation field cf Draine (1978, ApJS, 36,595 ). 
+
+Number is the number of the reaction in the downloaded network.
+
+Number of (alpha, beta, gamma) is the number of (alpha, beta, gamma) in the downloaded network when several values are present in KIDA. 
+When a user selects a range of temperature and that several rate coefficients in KIDA can be in agreement with his search, all data will be included in the network. 
+We then expect the user to choose one of the values. If the reactions are particularly important, we advise the user to contact KIDA to get advises. 
+These reactions that are present more than once in the network are listed below.
+
+Recommendation is the recommendation given by experts in KIDA. 
+0 means that the value is not recommended. 
+1 means that there is no recommendation (experts have not looked at the data). 
+2 means that the value has been validated by experts over the Trange
+3 means that it is the recommended value over Trange.

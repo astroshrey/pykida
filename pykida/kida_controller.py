@@ -60,7 +60,7 @@ class reaction:
 def initialize_network(filename):
     """This function takes in a kida.uva.xxxx file and creates an array of
     reaction objects. This array is quickly iterable, allowing for faster 
-    traversal of the network than currently exiss on the KIDA webpage.""" 
+    traversal of the network than currently exists on the KIDA webpage.""" 
     network = []
     network_file = open(filename)
     for i, line in enumerate(network_file):

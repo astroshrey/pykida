@@ -1,4 +1,9 @@
-from header_controller import * 
+import os
+current_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+os.chdir(current_path + "/pykida")
+from header_controller import *
+current_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+os.chdir(current_path + "/Nahoon_kida.uva.2014")
 
 def is_valid_param(param):
     """Given a parameter string, this method checks whether that parameter

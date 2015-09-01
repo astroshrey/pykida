@@ -10,5 +10,5 @@
 !       
        integer NS, NRTOT, NX, NTIME, NELEM 
        double precision XCO_0,XH2_0
-       parameter (NS=489, NRTOT=7500, NTIME=124,NX=1,NELEM=14)	
+       parameter (NS=489, NRTOT=7499, NTIME=124,NX=1,NELEM=14)	
        parameter (XCO_0=1.D-4, XH2_0=5.D-1)

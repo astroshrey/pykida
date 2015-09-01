@@ -1,0 +1,12 @@
+nrun=2000
+
+for ((i=1 ; i<=nrun ; i++))
+do
+  echo $i > num
+  ./run_rates
+  cp alpha MCUP/alpha$i.dat
+  ./nahoon_1d
+  mv plot.dat MCUP/plot$i.dat 
+  rm -f verif.dat
+  rm -f output.dat
+done

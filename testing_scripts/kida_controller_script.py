@@ -1,23 +1,26 @@
 import os
+import sys
 current_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-os.chdir(current_path + "/pykida")
+sys.path.append(current_path + "/src/")
 from kida_controller import *
 current_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 os.chdir(current_path + "/Nahoon_kida.uva.2014")
 
-#f = 'kida.uva.2014'
 ####################GETTING THE KIDA FILE###########
+#f = 'kida.uva.2014'
+#good_file = True
+
 good_file = False
 while good_file == False:
     try:
-        f = raw_input("Specify the initial condition file (CTRL+C to quit): ")
-        old_vals = initialize_network(f)
+        f = raw_input("Specify the KIDA file (CTRL+C to quit): ")
         good_file = True
     except IOError as e:
         print "I/O error({0}): {1}".format(e.errno, e.strerror)
         good_file = False
 
-if good_file == True: 
+if good_file == True:
+    old_vals = initialize_network(f)
     good_yes_no = False
     while good_yes_no == False:
         ################CHECKING IF THE FILE MUST BE CHANGED#####################
@@ -75,3 +78,4 @@ if good_file == True:
                     good_yes_no = True
         else:
             print "Whoops! That was a YES or NO question. Try again and don't mess up."
+os.chdir(current_path + "/testing_scripts")

@@ -1,9 +1,10 @@
 import os
+import sys
 current_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-os.chdir(current_path + "/pykida")
+sys.path.append(current_path + "/src/")
 from cond_initial_controller import *
 current_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-os.chdir(current_path + "/Nahoon_kida.uva.2014")
+os.chdir(current_path + "/Nahoon_kida.uva.2014/")
 
 def is_in_KIDA(old_vals, species):
     """Given a species, checks if the species is one of the species
@@ -13,20 +14,23 @@ def is_in_KIDA(old_vals, species):
             return True
     return False
 
-###########GETTING THE INPUT PARAM FILE#######################
-#f = 'cond_initial_2014.dat'
-good_file = False
-while good_file == False:
-    try:
-        f = raw_input("Specify the initial condition file (CTRL+C to quit): ")
-        old_vals = read_old_vals(f)
-        good_file = True
-    except IOError as e:
-        print "I/O error({0}): {1}".format(e.errno, e.strerror)
-        good_file = False
+###########GETTING THE INITIAL CONDITION FILE#######################
+f = 'cond_initial_kida.uva.2014.dat'
+good_file = True
+
+#good_file = False
+#while good_file == False:
+#    try:
+#        f = raw_input("Specify the initial condition file (CTRL+C to quit): ")
+#        good_file = True
+#    except IOError as e:
+#        print "I/O error({0}): {1}".format(e.errno, e.strerror)
+#        good_file = False
 
 ################CHECKING IF THE FILE MUST BE CHANGED##########
-if good_file == True: 
+
+if good_file == True:
+    old_vals = read_old_vals(f)
     check_vals(old_vals)
     good_yes_no = False
     while good_yes_no == False:
@@ -71,3 +75,5 @@ if good_file == True:
                     good_yes_no = True
         else:
             print "Whoops! That was a YES or NO question. Try again and don't mess up."
+
+os.chdir(current_path + "/testing_scripts")

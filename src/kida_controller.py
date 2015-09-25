@@ -76,7 +76,7 @@ def is_in_KIDA(reactants, products, network):
     for reaction in network:
         if sorted(reaction.reactants) == sorted(reactants):
             if sorted(reaction.products) == sorted(products):
-                return (True, network[reaction.index])
+                return (True, reaction)
     return (False, -1)
 
 def fortran_format(new_vals):

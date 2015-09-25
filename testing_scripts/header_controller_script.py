@@ -1,6 +1,7 @@
 import os
+import sys
 current_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-os.chdir(current_path + "/pykida")
+sys.path.append(current_path + "/src/")
 from header_controller import *
 current_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 os.chdir(current_path + "/Nahoon_kida.uva.2014")
@@ -11,19 +12,21 @@ def is_valid_param(param):
     return param == "NS" or param == "NRTOT" or param == "NX" or param == "NTIME" or param == "NELEM"
 
 ##################GETTING THE HEADER.F90 FILE#####################
-#f = 'header.f90'
-good_file = False
-while good_file == False:
-    try:
-        f = raw_input("Specify the initial condition file (CTRL+C to quit): ")
-        old_vals = read_old_vals(f)
-        good_file = True
-    except IOError as e:
-        print "I/O error({0}): {1}".format(e.errno, e.strerror)
-        good_file = False
+f = 'header.f90'
+good_file = True
+
+#good_file = False
+#while good_file == False:
+#    try:
+#        f = raw_input("Specify the header file (CTRL+C to quit): ")
+#        good_file = True
+#    except IOError as e:
+#        print "I/O error({0}): {1}".format(e.errno, e.strerror)
+#        good_file = False
 
 ##################CHECKING IF THE INFORMATION IN THE HEADER.F90 FILE IS CORRECT#####################
-if good_file == True: 
+if good_file == True:
+    old_vals = read_old_vals(f)
     check_vals(old_vals)
     good_yes_no = False
     while good_yes_no == False:
@@ -74,3 +77,4 @@ if good_file == True:
                     good_yes_no = True
         else:
             print "Whoops! That was a YES or NO question. Try again and don't mess up."
+os.chdir(current_path + "/testing_scripts")

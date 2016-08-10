@@ -47,7 +47,8 @@ for i, temp in enumerate(temps):
     kida_controller.write_new_vals(old, kida_file)
     
     #running KIDA
-    os.system(command1)
+    if i == 0:
+        os.system(command1)
     os.system(command2)
     
     #copying and shutiling the plot.dat and verif.dat files to the new directory
